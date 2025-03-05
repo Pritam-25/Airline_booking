@@ -1,4 +1,2 @@
-import {AirplaneController} from "./airplane-controller";
-import InfoController from "./info-controller";
+export { AirplaneController } from "./airplane-controller";
 
-export { AirplaneController, InfoController };

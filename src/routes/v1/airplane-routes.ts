@@ -1,9 +1,11 @@
-import { AirplaneController } from "../../controllers"; // Ensure this is correct
-import express from "express";
+import express from "express"
+import { AirplaneMiddlewares } from "../../middlewares"
+import { AirplaneController } from "../../controllers/airplane-controller"
 
-const router = express.Router();
+const router = express.Router()
 
-// ✅ FIX: Ensure proper function execution
-router.post('/',AirplaneController.createAirplane);
+const middleware = AirplaneMiddlewares.validateCreateRequest
 
-export default router;
+router.use("/", middleware, AirplaneController.createAirplane)
+
+export default router

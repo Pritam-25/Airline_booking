@@ -1,38 +1,24 @@
-import { Request, Response } from "express";
 import { Airplane } from "@prisma/client";
-import AirplaneService from "../services";
+import { Response, Request } from "express";
 import { StatusCodes } from "http-status-codes";
+import { errorResponse } from "../utils/common";
+import { successResponse } from "../utils/common";
+import { AirplaneService } from "../services";
 
-export async function createAirplane(req: Request, res: Response) {
+async function createAirplane(req: Request, res: Response) {
     try {
-        // ✅ Extract only modelNumber & capacity from Airplane model
-        const { modelName, capacity }: Pick<Airplane, "modelName" | "capacity"> = req.body;
+        const { modelName, capacity }: Pick<Airplane, "modelName" | "capacity"> = req.body
 
-        if (!modelName || !capacity) {
-            res.status(400).json({ error: "modelName and capacity are required" });
-            return
-        }
+        const airplane = await AirplaneService.createAirplane({ modelName, capacity })
 
-        // Call the service function
-        const airplane = await AirplaneService.createAirplane({ modelName, capacity });
+        successResponse(res, "Succesfully created an airplane", airplane, StatusCodes.CREATED)
+        return;
 
-        // console.log(airplane);
-
-        res.status(StatusCodes.CREATED).json({
-            success: true,
-            message: "Successfully created an airplane",
-            data: airplane,
-            error: {}
-        });
     } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: "Something went wrong while creating airplane",
-            data: {},
-            error: (error as Error).message
-        });
+        
+        errorResponse(res, error);
+        return;
     }
 }
 
-const AirplaneController = { createAirplane };
-export { AirplaneController };
+export const AirplaneController = { createAirplane }

@@ -1,16 +1,29 @@
-import AirplaneRepository from "../repositories";
+import { Prisma } from "@prisma/client";
+import AirplaneRepository from "../repositories/airplane-repository";
+import { StatusCodes } from "http-status-codes";
+import AppError from "../utils/errors/app-error";
 
-const airplaneRepository = new AirplaneRepository()
+const airplaneRepository = new AirplaneRepository();
 
-async function createAirplane(data:any) {
+async function createAirplane(data: Prisma.AirplaneCreateInput) {
     try {
-        console.log("Creating airplane with data:", data);
         const airplane = await airplaneRepository.create(data)
-        return airplane;
+
+        if (!airplane) {
+            throw new AppError("Failed to create airplane", StatusCodes.BAD_REQUEST)
+        }
+
+        return airplane
+
     } catch (error) {
-        console.error("Error in service layer:", error);
-        throw error
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            if (error.code === "P2002") {
+                throw new AppError("Something went wrong while creating the airplane", StatusCodes.CONFLICT, {message: `Unique constraint failed on: ${error.meta?.target}`})
+            }
+        }
+
+        throw new AppError("Internal Server Error", StatusCodes.INTERNAL_SERVER_ERROR)
     }
 }
 
-export default createAirplane
+export const AirplaneService = { createAirplane }

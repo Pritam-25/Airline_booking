@@ -1,7 +1,2 @@
-import createAirplane from "./airplane-service";
+export { AirplaneService } from "./airplane-service";
 
-const AirplaneService = {
-    createAirplane,
-};
-
-export default AirplaneService;
